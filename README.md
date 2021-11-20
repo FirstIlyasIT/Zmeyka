@@ -1,0 +1,2 @@
+# Zmeyka
+Simple game
