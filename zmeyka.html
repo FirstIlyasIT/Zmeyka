@@ -1,0 +1,171 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <style>
+    .bord{
+	border: 2px dashed red;
+	padding: 3px;
+	margin-bottom: 5px;
+	background: #FFDAB9;
+	}
+    .score{	
+    display: inline;
+    color:#7722aa;
+    }
+    </style>
+    <script>
+    	var Meal = [-30, -30];
+    	var MealDef = [-30, -30];
+  	var Mov = [10, 0];
+  	var Zm = [[100, 250], [120,250], [140,250], [160, 250], [180, 250], [200, 250]];
+  	var score = 0;
+  	var speed = 400;
+  	var velocity = 10;
+  	var canvas;
+  	
+  function Run(){
+  	setInterval(Game, speed);
+  }	
+  function Game(){
+  	canvas = document.getElementById("canvas");
+  	Move();
+  	AddLenght();
+  	ScoreView(); 
+  	Dead();
+  	var speedView = Math.round(100*(400/speed));
+    	document.getElementById("spr").innerHTML = speedView;		
+  }  
+  
+  function Move(){
+  	  
+	let ctx = canvas.getContext("2d");
+	
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	ctx.shadowColor = "#BDB76B";
+	ctx.shadowBlur = 5;
+	ctx.shadowOffsetX = 1;
+	ctx.shadowOffsetY = 1;
+		
+	for(var i = 0; i< Zm.length; i++){
+		if(i%2==0){
+		ctx.fillStyle = "#9ACD32";
+		}
+		else{
+		ctx.fillStyle = "#228B22";
+		}
+		ctx.fillRect(Zm[i][0], Zm[i][1], 20, 20);
+		}
+				
+	for(var i = 0; i < Zm.length -1 ; i++){
+		Zm[i][0] = Zm[i+1][0];
+		Zm[i][1] = Zm[i+1][1];
+		}
+	
+	Zm[Zm.length-1][0] += Mov[0];
+	Zm[Zm.length-1][1] += Mov[1];		
+  }
+  
+  function AddLenght(){
+	let ctx = canvas.getContext("2d");
+	ctx.fillStyle = "#FF8C00";
+	ctx.strokeStyle = "#9932CC";
+	ctx.lineWidth = 10;
+	ctx.shadowColor = "#483D8B";
+	ctx.shadowBlur = 5;
+	ctx.shadowOffsetX = 3;
+	ctx.shadowOffsetY = 3;
+	
+	
+	if(Meal[0] == MealDef[0] && Meal[1] == MealDef[1]){
+	Meal[0] = Math.round(Math.floor(Math.random() * ((canvas.width-30) - 30)));
+	Meal[1] = Math.round(Math.floor(Math.random() * ((canvas.height-30) - 30)));
+	}
+	
+	let ZmEatMealX = Meal[0]+10>=Zm[Zm.length-1][0]&&Zm[Zm.length-1][0]>=Meal[0]-30;
+	let ZmEatMealY = Meal[1]+10>=Zm[Zm.length-1][1]&&Zm[Zm.length-1][1]>=Meal[1]-30;
+	
+	if(ZmEatMealX && ZmEatMealY){		
+	let add = [Zm[0][0]-Mov[0], Zm[0][1]-Mov[1]];				
+	Zm.unshift(add);
+	score += 1;
+	velocity += 1;
+	speed = speed - velocity;
+	Meal[0] = MealDef[0];
+	Meal[1] = MealDef[1];
+	clearInterval();
+    	setInterval(Game, speed); 	
+	}
+	
+	ctx.beginPath();	
+	ctx.arc(Meal[0], Meal[1], 20, 0, 2*Math.PI, false);
+	ctx.stroke();
+	ctx.fill();		
+  }
+  function Dead(){  	
+  	if(Zm[Zm.length-1][0] < -10){
+  	alert('you dead');
+  	location.reload();
+  	}
+  	if(Zm[Zm.length-1][1] < -10){
+  	alert('you dead');
+  	location.reload();
+  	}
+  	if(Zm[Zm.length-1][0] > canvas.width+10){
+  	alert('you dead');
+  	location.reload();
+  	}
+  	if(Zm[Zm.length-1][1] >= canvas.height+10){
+  	alert('you dead');
+  	location.reload();
+  	}	
+  	
+  	for(var i = 0; i< Zm.length-4; i++){
+		if((Zm[Zm.length-1][0] == Zm[i][0])&&(Zm[Zm.length-1][1] == Zm[i][1])){
+		alert('you dead');
+		location.reload();
+		}
+		}
+  }
+  
+    function ScoreView(){  	
+	let ctx = canvas.getContext("2d");
+	ctx.strokeStyle="#EEE8AA";
+	ctx.font = "250px serif";
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.shadowColor = "#BDB76B";
+	ctx.shadowBlur = 5;
+	ctx.shadowOffsetX = 5;
+	ctx.shadowOffsetY = 5;
+ 	ctx.strokeText(score, canvas.width/2, canvas.height/2, canvas.width);
+
+  }
+  
+  document.addEventListener('keydown', function(event) {
+  switch (event.code) {
+  case 'KeyD':
+    Mov = [10, 0];
+    break;
+  case 'KeyA':
+    Mov = [-10, 0];
+    break;
+  case 'KeyW':
+    Mov = [0, -10];
+    break;
+  case 'KeyS':
+    Mov = [0, 10];
+    break;}
+}
+);
+  </script>
+  </head>
+  <body>
+  <canvas class = "bord" id="canvas" width="500" height="500"></canvas>
+  <br>
+  <p class="score">speed X<div class="score" id="spr"></div> </p>  
+  <script>
+  	Run();  	
+  </script>
+  </body>  
+</html>
